@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import '../services/ai_service.dart';
 import '../widgets/chat_bubble.dart';
 
@@ -22,6 +23,27 @@ class _ChatGPTScreenState extends State<ChatGPTScreen> {
     setState(() => _messages.add({"text": result, "isUser": false}));
   }
 
+  void _pickFile() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
+    );
+
+    if (result != null) {
+      final file = result.files.first;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('File Selected: ${file.name}')),
+      );
+
+      // If you want to upload to Firebase, add logic here
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('File selection canceled')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,6 +58,18 @@ class _ChatGPTScreenState extends State<ChatGPTScreen> {
                 final msg = _messages[i];
                 return ChatBubble(message: msg['text'], isUser: msg['isUser']);
               },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: ElevatedButton.icon(
+              onPressed: _pickFile,
+              icon: Icon(Icons.upload_file),
+              label: Text("Upload File"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.indigo,
+                foregroundColor: Colors.white,
+              ),
             ),
           ),
           Padding(
